@@ -26,7 +26,6 @@ export class Amoeba {
   tryStartControl(controlPosition) {
     this.controlVector = new Vector();
     let localControlPosition = Vector.getMinus(controlPosition, this.position);
-    console.log(localControlPosition);
     for (let arm of this.arms) {
       if (
         Vector.getDistance(arm.position, localControlPosition) <

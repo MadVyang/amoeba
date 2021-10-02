@@ -1,6 +1,6 @@
 import { Vector } from './Helper.js';
 
-let _canvas = document.querySelector('canvas');
+let _canvas = document.querySelector('#canvas');
 let _context = canvas.getContext('2d');
 
 export class Renderer {
@@ -119,5 +119,16 @@ export class Renderer {
       vector.x - Renderer.camPosition.x,
       vector.y - Renderer.camPosition.y
     );
+  }
+
+  static printDebug(debugString) {
+    let debugContext = document.querySelector('#debugPanel').getContext('2d');
+    debugContext.clearRect(
+      0,
+      0,
+      document.querySelector('#debugPanel').width,
+      document.querySelector('#debugPanel').height
+    );
+    debugContext.fillText(debugString, 0, 12);
   }
 }
