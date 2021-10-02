@@ -5,6 +5,7 @@ const controlPower = 0.03;
 const ameobaGravity = 0.002;
 const amoebaMoveFraction = 0.97;
 
+const armExpansion = 1.2;
 const armMoveFraction = 0.95;
 const armRadiusMin = 2;
 const armVelocityMax = 2.5;
@@ -12,12 +13,12 @@ const armVelocityMax = 2.5;
 export class Amoeba {
   constructor(numArms = 100, armDefaultRadius = 5) {
     this.arms = [];
-    this.radius = armDefaultRadius / Math.sin(Math.PI / numArms);
+    let tempSpawnRadius = armDefaultRadius / Math.sin(Math.PI / numArms);
     let sumArmRadiusSquare = 0;
     for (let i = 0; i < numArms; i++) {
       let armPosition = new Vector(
-        Math.cos(i * ((Math.PI * 2) / numArms)) * this.radius,
-        Math.sin(i * ((Math.PI * 2) / numArms)) * this.radius
+        Math.cos(i * ((Math.PI * 2) / numArms)) * tempSpawnRadius,
+        Math.sin(i * ((Math.PI * 2) / numArms)) * tempSpawnRadius
       );
       let armRadius =
         armDefaultRadius + armDefaultRadius * (Math.random() - 0.5);
@@ -88,7 +89,7 @@ export class Amoeba {
   }
   attachArmToNucleus() {
     for (let arm of this.arms) {
-      let excess = arm.position.getSize() - this.radius;
+      let excess = arm.position.getSize() * armExpansion - this.radius;
       if (excess > 0) {
         arm.velocity.add(
           Vector.getMultiple(arm.position.getNormal(), -excess * ameobaGravity)

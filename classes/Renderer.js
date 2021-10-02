@@ -65,10 +65,10 @@ export class Renderer {
         );
         Renderer.context.stroke();
       } else Renderer.setStyle('#AAA', 1);
-      Renderer.context.beginPath();
-      Renderer.moveTo(amoeba.position);
-      Renderer.lineTo(Vector.getAddition(amoeba.position, arm.position));
-      Renderer.context.stroke();
+      // Renderer.context.beginPath();
+      // Renderer.moveTo(amoeba.position);
+      // Renderer.lineTo(Vector.getAddition(amoeba.position, arm.position));
+      // Renderer.context.stroke();
       Renderer.renderArm(amoeba.position, arm);
     }
   }
