@@ -92,11 +92,11 @@ export class Amoeba {
       let excess = arm.position.getSize() * armExpansion - this.radius;
       if (excess > 0) {
         arm.velocity.add(
-          Vector.getMultiple(arm.position.getNormal(), -excess * ameobaGravity)
+          Vector.getMultiple(arm.position.getUnit(), -excess * ameobaGravity)
         );
         this.velocity.add(
           Vector.getMultiple(
-            arm.position.getNormal(),
+            arm.position.getUnit(),
             (excess * ameobaGravity * arm.radius) / armRadiusMin
           )
         );

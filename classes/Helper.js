@@ -22,7 +22,7 @@ export class Vector {
   getSize() {
     return Math.sqrt(this.x * this.x + this.y * this.y);
   }
-  getNormal() {
+  getUnit() {
     return Vector.getMultiple(this, 1 / this.getSize());
   }
   getDirection() {
