@@ -1,5 +1,9 @@
 import { Vector } from './Helper.js';
 
+const RED = '#A00',
+  BLUE = '#00A',
+  GREEN = '#0A0',
+  BLACK = '#AAA';
 const smoothness = 0.9;
 
 let _canvas = document.querySelector('#canvas');
@@ -43,6 +47,19 @@ export class Renderer {
       projectedTargetPoint.y
     );
   }
+  static circle(point, radius) {
+    let projectedPoint = Renderer.projectToScreen(point);
+    Renderer.context.beginPath();
+    Renderer.context.arc(
+      projectedPoint.x,
+      projectedPoint.y,
+      radius,
+      0,
+      Math.PI * 2
+    );
+    Renderer.context.stroke();
+    Renderer.context.closePath();
+  }
 
   static renderMap(map) {
     Renderer.renderAmoeba(map.amoeba);
@@ -53,7 +70,7 @@ export class Renderer {
   static renderAmoeba(amoeba) {
     for (let arm of amoeba.arms) {
       if (arm.isSelected) {
-        Renderer.setStyle('#00A', 2);
+        Renderer.setStyle(BLUE, 1);
         Renderer.context.beginPath();
         let armWorldPosition = Vector.getAddition(
           amoeba.position,
@@ -64,7 +81,7 @@ export class Renderer {
           Vector.getAddition(armWorldPosition, amoeba.controlVector)
         );
         Renderer.context.stroke();
-      } else Renderer.setStyle('#AAA', 1);
+      } else Renderer.setStyle(BLACK, 1);
       // Renderer.context.beginPath();
       // Renderer.moveTo(amoeba.position);
       // Renderer.lineTo(Vector.getAddition(amoeba.position, arm.position));
@@ -73,31 +90,16 @@ export class Renderer {
     }
   }
   static renderArm(amoebaPosition, arm) {
-    let projectedPoint = Renderer.projectToScreen(
-      Vector.getAddition(amoebaPosition, arm.position)
+    if (arm.isSelected) Renderer.setStyle(BLUE, 1);
+    else Renderer.setStyle(BLACK, 1);
+    Renderer.circle(
+      Vector.getAddition(amoebaPosition, arm.position),
+      arm.radius
     );
-    if (arm.isSelected) Renderer.setStyle('#00A', 2);
-    else Renderer.setStyle('#AAA', 1);
-    Renderer.context.beginPath();
-    Renderer.context.arc(
-      projectedPoint.x,
-      projectedPoint.y,
-      arm.radius,
-      0,
-      Math.PI * 2
-    );
-    Renderer.context.stroke();
-    Renderer.context.closePath();
   }
   static renderFood(food) {
-    let projectedPoint = Renderer.projectToScreen(food.position);
-    Renderer.setStyle('#A00', 1);
-    Renderer.context.strokeRect(
-      projectedPoint.x,
-      projectedPoint.y,
-      food.size,
-      food.size
-    );
+    Renderer.setStyle(GREEN, 1);
+    Renderer.circle(food.position, food.radius);
   }
 
   static focusTo(point) {

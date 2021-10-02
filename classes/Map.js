@@ -15,8 +15,8 @@ export class Map {
 }
 
 export class Food {
-  constructor(position, size) {
+  constructor(position, radius) {
     this.position = position;
-    this.size = size;
+    this.radius = radius;
   }
 }
