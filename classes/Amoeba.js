@@ -1,14 +1,15 @@
 import { Vector, interval } from './Helper.js';
 
 const controlRadius = 20;
-const controlPower = 0.03;
+const controlPower = 0.1;
 
+const amoebaFriction = 0.5;
 const amoebaBoundary = 1.3;
 const amoebaGravity = 0.005;
-const amoebaMoveFriction = 0.97;
 
-const armExpansion = 1.2;
 const armFriction = 0.1;
+const armExpansionMax = 1.2;
+const armRepulsion = 0.03;
 const armRadiusMin = 2;
 const armVelocityMax = 3;
 
@@ -78,17 +79,21 @@ export class Amoeba {
         if (i == j) continue;
         let armA = this.arms[i];
         let armB = this.arms[j];
-        if (
-          Vector.getDistance(armA.position, armB.position) <
-          armA.radius + armB.radius
-        ) {
-          let delta = Vector.getMinus(armA.position, armB.position);
-          let direction = Vector.getLookAt(armA.position, armB.position);
+        let delta = Vector.getMinus(armA.position, armB.position);
+        let direction = Vector.getLookAt(armA.position, armB.position);
+        if (delta.getLength() < armA.radius + armB.radius) {
           armA.velocity.add(
-            Vector.getMultiple(direction, 1 / delta.getLength())
+            Vector.getMultiple(direction, delta.getLength() * armRepulsion)
           );
           armB.velocity.add(
-            Vector.getMultiple(direction, -1 / delta.getLength())
+            Vector.getMultiple(direction, -delta.getLength() * armRepulsion)
+          );
+        } else {
+          armA.velocity.add(
+            Vector.getMultiple(direction, -0.01 / delta.getLength())
+          );
+          armB.velocity.add(
+            Vector.getMultiple(direction, 0.01 / delta.getLength())
           );
         }
       }
@@ -96,7 +101,7 @@ export class Amoeba {
   }
   attachArmToNucleus() {
     for (let arm of this.arms) {
-      let excess = arm.position.getLength() * armExpansion - this.radius;
+      let excess = arm.position.getLength() * armExpansionMax - this.radius;
       if (excess > 0) {
         arm.velocity.add(
           Vector.getMultiple(arm.position.getUnit(), -excess * amoebaGravity)
@@ -108,10 +113,15 @@ export class Amoeba {
     }
   }
   move() {
-    this.velocity.multiply(amoebaMoveFriction);
+    if (this.velocity.getLength() > amoebaFriction) {
+      this.velocity.minus(
+        Vector.getMultiple(this.velocity.getUnit(), amoebaFriction)
+      );
+    } else this.velocity.multiply(0.98);
     this.position.add(this.velocity);
+
     for (let arm of this.arms) {
-      arm.position.minus(Vector.getMultiple(this.velocity, 0.9));
+      // arm.position.minus(Vector.getMultiple(this.velocity, 0.1));
     }
   }
 }
