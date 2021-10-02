@@ -1,3 +1,3 @@
 # amoeba
 
-[Edit on StackBlitz ⚡️](https://stackblitz.com/edit/amoeba)
+[View on StackBlitz ⚡️](https://amoeba.stackblitz.io/)
