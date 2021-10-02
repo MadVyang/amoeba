@@ -13,19 +13,44 @@ export class Amoeba {
         new Arm(position, armRadius + armRadius * 0.3 * (Math.random() - 0.5))
       );
     }
-    this.position = new Vector(0, 0);
-    this.velocity = new Vector(0, 0);
+    this.position = new Vector();
+    this.velocity = new Vector();
+    this.selectedArm = null;
+    this.controlVector = new Vector();
 
     setInterval(() => {
       this.tick();
     }, interval);
   }
 
-  setTargetPosition(targetPosition) {
-    let localTargetPosition = targetPosition.minus(this.position);
+  tryStartControl(controlPosition) {
+    this.controlVector = new Vector();
+    let localControlPosition = Vector.getMinus(controlPosition, this.position);
+    console.log(localControlPosition);
     for (let arm of this.arms) {
-      arm.velocity.add(localTargetPosition);
+      if (
+        Vector.getDistance(arm.position, localControlPosition) <
+        arm.radius * 2
+      ) {
+        arm.isSelected = true;
+        this.selectedArm = arm;
+        // TODO: select nearest
+        break;
+      }
     }
+  }
+  endControl() {
+    if (this.selectedArm) {
+      this.selectedArm.velocity.add(
+        Vector.getMultiple(this.controlVector, 0.1)
+      );
+      this.selectedArm.isSelected = false;
+      this.selectedArm = null;
+    }
+  }
+
+  setControlVector(controlVector) {
+    this.controlVector = controlVector;
   }
 
   // private
@@ -72,8 +97,11 @@ export class Arm {
     this.position = position;
     this.radius = radius;
 
-    this.velocity = new Vector(0, 0);
-    this.velocityMax = 2;
+    this.velocity = new Vector();
+    this.velocityMax = this.radius;
+
+    this.isSelected = false;
+    this.controlVector = new Vector();
 
     setInterval(() => {
       this.tick();
