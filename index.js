@@ -1,8 +1,8 @@
-import { Renderer } from './Renderer.js';
-import { Map } from './Map.js';
-import { Amoeba } from './Amoeba.js';
-import { Controller } from './Controller.js';
-import { Vector, interval } from './Helper.js';
+import { Renderer } from './classes/Renderer.js';
+import { Map } from './classes/Map.js';
+import { Amoeba } from './classes/Amoeba.js';
+import { Controller } from './classes/Controller.js';
+import { Vector, interval } from './classes/Helper.js';
 
 let map;
 let amoeba;
