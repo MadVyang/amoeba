@@ -1,0 +1,46 @@
+let head = amoeba.joints[0];
+    let startPoint = Vector.getAddition(
+      head.position,
+      Vector.getMultiple(head.heading, head.radius)
+    );
+    let drawPoint = Renderer.getDrawPoint(startPoint);
+
+    Renderer.context.strokeStyle = '#000';
+    Renderer.context.beginPath();
+    Renderer.context.moveTo(drawPoint.x, drawPoint.y);
+    for (let joint of amoeba.joints) {
+      Renderer.renderJointUpside(joint);
+    }
+    for (let i in amoeba.joints) {
+      Renderer.renderJointDownside(amoeba.joints[amoeba.joints.length - 1 - i]);
+    }
+    Renderer.context.stroke();
+    Renderer.context.closePath();
+
+
+static renderJointUpside(joint) {
+    let direction = joint.heading.getDirection();
+    for (let i = 1; i < Renderer.numSidePoints; i++) {
+      let sideDirection = direction + (Math.PI / Renderer.numSidePoints) * i;
+      let side = new Vector(Math.cos(sideDirection), Math.sin(sideDirection));
+      let point = Vector.getAddition(
+        joint.position,
+        side.multiply(joint.radius)
+      );
+      let drawPoint = Renderer.getDrawPoint(point);
+      Renderer.context.lineTo(drawPoint.x, drawPoint.y);
+    }
+  }
+  static renderJointDownside(joint) {
+    let direction = joint.heading.getDirection();
+    for (let i = Renderer.numSidePoints - 1; i > 0; i--) {
+      let sideDirection = direction - (Math.PI / Renderer.numSidePoints) * i;
+      let side = new Vector(Math.cos(sideDirection), Math.sin(sideDirection));
+      let point = Vector.getAddition(
+        joint.position,
+        side.multiply(joint.radius)
+      );
+      let drawPoint = Renderer.getDrawPoint(point);
+      Renderer.context.lineTo(drawPoint.x, drawPoint.y);
+    }
+  }
