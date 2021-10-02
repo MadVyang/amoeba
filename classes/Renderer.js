@@ -1,5 +1,7 @@
 import { Vector } from './Helper.js';
 
+const smoothness = 0.9;
+
 let _canvas = document.querySelector('#canvas');
 let _context = canvas.getContext('2d');
 
@@ -109,7 +111,6 @@ export class Renderer {
       point,
       Vector.getMultiple(Renderer.screenSize, -0.5)
     );
-    const smoothness = 0.9;
     Renderer.camPosition.add(
       Vector.getMinus(target, Renderer.camPosition).multiply(smoothness)
     );

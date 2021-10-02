@@ -1,16 +1,25 @@
 import { Vector, interval } from './Helper.js';
 
+const controlPower = 0.03;
+
+const ameobaGravity = 0.002;
+const amoebaMoveFraction = 0.97;
+
+const armMoveFraction = 0.95;
+const armRadiusMin = 2;
+const armVelocityMax = 2.1;
+
 export class Amoeba {
-  constructor(numArms = 30, armRadius = 10) {
+  constructor(numArms = 10, armRadius = 20) {
     this.arms = [];
-    this.radius = (armRadius * 0.9) / Math.sin(Math.PI / numArms);
+    this.radius = armRadius / Math.sin(Math.PI / numArms);
     for (let i = 0; i < numArms; i++) {
       let position = new Vector(
         Math.cos(i * ((Math.PI * 2) / numArms)) * this.radius,
         Math.sin(i * ((Math.PI * 2) / numArms)) * this.radius
       );
       this.arms.push(
-        new Arm(position, armRadius + armRadius * 0.4 * (Math.random() - 0.5))
+        new Arm(position, armRadius + armRadius * (Math.random() - 0.5))
       );
     }
     this.position = new Vector();
@@ -39,7 +48,6 @@ export class Amoeba {
     }
   }
   endControl() {
-    const controlPower = 0.01;
     if (this.selectedArm) {
       this.selectedArm.velocity.add(
         Vector.getMultiple(this.controlVector, controlPower)
@@ -77,26 +85,27 @@ export class Amoeba {
     }
   }
   attachArmToNucleus() {
-    const gravity = 0.005;
     for (let arm of this.arms) {
-      let excess = arm.position.getSize() - this.radius / 2;
+      let excess = arm.position.getSize() - this.radius;
       if (excess > 0) {
         arm.velocity.add(
-          Vector.getMultiple(arm.position.getNormal(), -excess * gravity)
+          Vector.getMultiple(arm.position.getNormal(), -excess * ameobaGravity)
         );
         this.velocity.add(
           Vector.getMultiple(
             arm.position.getNormal(),
-            (excess * gravity) / (this.radius / 2 / arm.radius)
+            (excess * ameobaGravity * arm.radius) / armRadiusMin
           )
         );
       }
     }
   }
   move() {
-    const amoebaMoveFraction = 0.94;
     this.velocity.multiply(amoebaMoveFraction);
     this.position.add(this.velocity);
+    for (let arm of this.arms) {
+      arm.position.minus(this.velocity);
+    }
   }
 }
 
@@ -106,7 +115,6 @@ export class Arm {
     this.radius = radius;
 
     this.velocity = new Vector();
-    this.velocityMax = this.radius;
 
     this.isSelected = false;
     this.controlVector = new Vector();
@@ -118,16 +126,19 @@ export class Arm {
 
   // private
   tick() {
-    this.limitVelocity();
     this.move();
-  }
-  limitVelocity() {
-    if (this.velocity.getSize() > this.velocityMax)
-      this.velocity.multiply(this.velocityMax / this.velocity.getSize());
+    this.loss();
   }
   move() {
-    const armMoveFraction = 0.95;
     this.velocity.multiply(armMoveFraction);
     this.position.add(this.velocity);
+  }
+  loss() {
+    if (
+      this.radius > armRadiusMin &&
+      this.velocity.getSize() > armVelocityMax
+    ) {
+      this.radius -= (this.velocity.getSize() / armVelocityMax) * 0.3;
+    }
   }
 }
