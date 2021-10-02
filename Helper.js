@@ -9,6 +9,11 @@ export class Vector {
     this.y += vector.y;
     return this;
   }
+  minus(vector) {
+    this.x -= vector.x;
+    this.y -= vector.y;
+    return this;
+  }
   multiply(scalar) {
     this.x *= scalar;
     this.y *= scalar;

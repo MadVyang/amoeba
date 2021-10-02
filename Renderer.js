@@ -1,5 +1,3 @@
-import { Map, Food } from './Map.js';
-import { Amoeba, Joint } from './Amoeba.js';
 import { Vector } from './Helper.js';
 
 let _canvas = document.querySelector('canvas');
@@ -10,8 +8,6 @@ export class Renderer {
   static context = _context;
   static screenSize = new Vector(_canvas.width, _canvas.height);
   static camPosition = new Vector(-_canvas.width / 2, -_canvas.height / 2);
-
-  static numSidePoints = 15;
 
   static clear() {
     Renderer.context.clearRect(
@@ -44,76 +40,29 @@ export class Renderer {
 
   static renderMap(map) {
     Renderer.renderAmoeba(map.amoeba);
-
     for (let food of map.foods) {
       Renderer.renderFood(food);
     }
   }
   static renderAmoeba(amoeba) {
-    for (let joint of amoeba.joints) Renderer.renderJoint(joint);
-
-    let point = Vector.getAddition(
-      amoeba.head.position,
-      Vector.getMultiple(amoeba.head.heading, amoeba.head.radius)
-    );
-    let heading = amoeba.head.heading;
-
-    Renderer.context.strokeStyle = '#666';
-    Renderer.context.beginPath();
-    Renderer.moveTo(point);
-    for (let joint of amoeba.joints) {
-      let right = Vector.getVectorFromDirection(
-        joint.heading.getDirection() + Math.PI / 2
-      );
-      let nextPoint = Vector.getAddition(
-        joint.position,
-        Vector.getMultiple(right, joint.radius)
-      );
-      let nextHeading = right;
-      let controlPoint = Vector.getAddition(point, nextPoint).multiply(0.5);
-      controlPoint.add(
-        Vector.getVectorFromDirection(
-          (heading.getDirection() + nextHeading.getDirection()) / 2
-        ).multiply(joint.radius / 2)
-      );
-      Renderer.quadraticCurveTo(controlPoint, nextPoint);
-      point = nextPoint;
-      heading = nextHeading;
+    for (let arm of amoeba.arms) {
+      Renderer.context.strokeStyle = '#CCC';
+      Renderer.moveTo(amoeba.position);
+      Renderer.lineTo(Vector.getAddition(amoeba.position, arm.position));
+      Renderer.context.stroke();
+      Renderer.renderArm(amoeba.position, arm);
     }
-
-    amoeba.joints.reverse();
-    for (let joint of amoeba.joints) {
-      let right = Vector.getVectorFromDirection(
-        joint.heading.getDirection() - Math.PI / 2
-      );
-      let nextPoint = Vector.getAddition(
-        joint.position,
-        Vector.getMultiple(right, joint.radius)
-      );
-      let nextHeading = right;
-      let controlPoint = Vector.getAddition(point, nextPoint).multiply(0.5);
-      controlPoint.add(
-        Vector.getVectorFromDirection(
-          (heading.getDirection() + nextHeading.getDirection()) / 2
-        ).multiply(joint.radius / 2)
-      );
-      Renderer.quadraticCurveTo(controlPoint, nextPoint);
-      point = nextPoint;
-      heading = nextHeading;
-    }
-    amoeba.joints.reverse();
-
-    Renderer.context.closePath();
-    Renderer.context.stroke();
   }
-  static renderJoint(joint) {
-    let projectedPoint = Renderer.projectToScreen(joint.position);
+  static renderArm(amoebaPosition, arm) {
+    let projectedPoint = Renderer.projectToScreen(
+      Vector.getAddition(amoebaPosition, arm.position)
+    );
     Renderer.context.strokeStyle = '#CCC';
     Renderer.context.beginPath();
     Renderer.context.arc(
       projectedPoint.x,
       projectedPoint.y,
-      joint.radius,
+      arm.radius,
       0,
       Math.PI * 2
     );
@@ -126,8 +75,8 @@ export class Renderer {
     Renderer.context.strokeRect(
       projectedPoint.x,
       projectedPoint.y,
-      food.size.x,
-      food.size.y
+      food.size,
+      food.size
     );
   }
 

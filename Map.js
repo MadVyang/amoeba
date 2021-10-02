@@ -8,7 +8,7 @@ export class Map {
     for (let i = 0; i < numFoods; i++) {
       this.foods[i] = new Food(
         new Vector((Math.random() - 0.5) * 1000, (Math.random() - 0.5) * 1000),
-        new Vector(Math.random() * 10, Math.random() * 10)
+        Math.random() * 10
       );
     }
   }
