@@ -57,7 +57,7 @@ export class Amoeba {
     for (let arm of this.arms) {
       if (arm.position.getSize() > this.radius) {
         arm.velocity.add(Vector.getMultiple(arm.position, -0.005));
-        this.velocity.add(Vector.getMultiple(arm.position, 0.0005));
+        this.velocity.add(Vector.getMultiple(arm.position, 0.001));
       }
     }
   }
