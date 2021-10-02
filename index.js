@@ -10,7 +10,7 @@ let amoeba;
 let frameHandler = () => {
   Renderer.clear();
   Renderer.smoothlyFocusTo(amoeba.position);
-  Renderer.renderMap(map);
+  // Renderer.renderMap(map);
 };
 
 let init = () => {
@@ -18,8 +18,7 @@ let init = () => {
   map = new Map(amoeba);
 
   setInterval(frameHandler, interval);
-  window.addEventListener('click', Controller.clickHandler);
-  Controller.setControllingAmoeba(amoeba);
+  Controller.initialize(amoeba);
 };
 
 init();
