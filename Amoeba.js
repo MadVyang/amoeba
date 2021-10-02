@@ -10,7 +10,7 @@ export class Amoeba {
         Math.sin(i * ((Math.PI * 2) / numArms)) * this.radius
       );
       this.arms.push(
-        new Arm(position, armRadius + armRadius * 0.3 * (Math.random() - 0.5))
+        new Arm(position, armRadius + armRadius * 0.4 * (Math.random() - 0.5))
       );
     }
     this.position = new Vector();
@@ -39,9 +39,10 @@ export class Amoeba {
     }
   }
   endControl() {
+    const controlPower = 0.01;
     if (this.selectedArm) {
       this.selectedArm.velocity.add(
-        Vector.getMultiple(this.controlVector, 0.1)
+        Vector.getMultiple(this.controlVector, controlPower)
       );
       this.selectedArm.isSelected = false;
       this.selectedArm = null;
@@ -70,23 +71,31 @@ export class Amoeba {
         ) {
           let delta = Vector.getMinus(prevArm.position, arm.position);
           let direction = Vector.getLookAt(prevArm.position, arm.position);
-          arm.velocity.add(
-            Vector.getMultiple(direction, -0.7 / delta.getSize())
-          );
+          arm.velocity.add(Vector.getMultiple(direction, -1 / delta.getSize()));
         }
       }
     }
   }
   attachArmToNucleus() {
+    const gravity = 0.005;
     for (let arm of this.arms) {
-      if (arm.position.getSize() > this.radius) {
-        arm.velocity.add(Vector.getMultiple(arm.position, -0.005));
-        this.velocity.add(Vector.getMultiple(arm.position, 0.001));
+      let excess = arm.position.getSize() - this.radius / 2;
+      if (excess > 0) {
+        arm.velocity.add(
+          Vector.getMultiple(arm.position.getNormal(), -excess * gravity)
+        );
+        this.velocity.add(
+          Vector.getMultiple(
+            arm.position.getNormal(),
+            (excess * gravity) / (this.radius / 2 / arm.radius)
+          )
+        );
       }
     }
   }
   move() {
-    this.velocity.multiply(0.97);
+    const amoebaMoveFraction = 0.94;
+    this.velocity.multiply(amoebaMoveFraction);
     this.position.add(this.velocity);
   }
 }
@@ -117,7 +126,8 @@ export class Arm {
       this.velocity.multiply(this.velocityMax / this.velocity.getSize());
   }
   move() {
-    this.velocity.multiply(0.97);
+    const armMoveFraction = 0.95;
+    this.velocity.multiply(armMoveFraction);
     this.position.add(this.velocity);
   }
 }
