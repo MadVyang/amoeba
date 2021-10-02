@@ -10,18 +10,21 @@ const armRadiusMin = 2;
 const armVelocityMax = 2.5;
 
 export class Amoeba {
-  constructor(numArms = 10, armRadius = 20) {
+  constructor(numArms = 100, armDefaultRadius = 5) {
     this.arms = [];
-    this.radius = armRadius / Math.sin(Math.PI / numArms);
+    this.radius = armDefaultRadius / Math.sin(Math.PI / numArms);
+    let sumArmRadiusSquare = 0;
     for (let i = 0; i < numArms; i++) {
-      let position = new Vector(
+      let armPosition = new Vector(
         Math.cos(i * ((Math.PI * 2) / numArms)) * this.radius,
         Math.sin(i * ((Math.PI * 2) / numArms)) * this.radius
       );
-      this.arms.push(
-        new Arm(position, armRadius + armRadius * (Math.random() - 0.5))
-      );
+      let armRadius =
+        armDefaultRadius + armDefaultRadius * (Math.random() - 0.5);
+      this.arms.push(new Arm(armPosition, armRadius));
+      sumArmRadiusSquare += armRadius;
     }
+    this.radius = Math.sqrt(sumArmRadiusSquare);
     this.position = new Vector();
     this.velocity = new Vector();
     this.selectedArm = null;
@@ -126,7 +129,7 @@ export class Arm {
   // private
   tick() {
     this.move();
-    this.loss();
+    // this.loss();
   }
   move() {
     this.velocity.multiply(armMoveFraction);
