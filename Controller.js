@@ -3,40 +3,69 @@ import { Vector } from './Helper.js';
 
 export class Controller {
   static controllingAmoeba;
-  static touchStartPosition = new Vector();
-  static isTouchingNow = false;
+  static controlStartPosition = new Vector();
+  static isControllingNow = false;
 
   static initialize(amoeba) {
     Controller.setControllingAmoeba(amoeba);
-    window.addEventListener('click', Controller.clickHandler);
+
+    window.addEventListener('mousedown', Controller.mouseDownHandler);
+    window.addEventListener('mouseup', Controller.mouseUpHandler);
+    window.addEventListener('mousemove', Controller.mouseMoveHandler);
+
     window.addEventListener('touchstart', Controller.touchStartHandler);
     window.addEventListener('touchend', Controller.touchEndHandler);
     window.addEventListener('touchmove', Controller.touchMoveHandler);
-    window.addEventListener('mousedown', Controller.touchStartHandler);
-    window.addEventListener('mouseup', Controller.touchEndHandler);
-    window.addEventListener('mousemove', Controller.touchMoveHandler);
   }
 
   static setControllingAmoeba(amoeba) {
     Controller.controllingAmoeba = amoeba;
   }
 
-  static clickHandler(e) {}
+  static mouseDownHandler(e) {
+    e.preventDefault();
+    Controller.startControl(new Vector(e.offsetX, e.offsetY));
+  }
+  static mouseUpHandler(e) {
+    e.preventDefault();
+    Controller.endControl();
+  }
+  static mouseMoveHandler(e) {
+    e.preventDefault();
+    Controller.moveControl(new Vector(e.offsetX, e.offsetY));
+  }
   static touchStartHandler(e) {
-    Controller.isTouchingNow = true;
-    Controller.touchStartPosition = new Vector(e.offsetX, e.offsetY);
-    Controller.controllingAmoeba.tryStartControl(
-      Vector.getAddition(Controller.touchStartPosition, Renderer.camPosition)
-    );
+    e.preventDefault();
+    for (let touch of e.changedTouches) {
+      Controller.startControl(new Vector(touch.offsetX, touch.offsetY));
+    }
   }
   static touchEndHandler(e) {
-    Controller.isTouchingNow = false;
-    Controller.controllingAmoeba.endControl();
+    e.preventDefault();
+    Controller.endControl();
   }
   static touchMoveHandler(e) {
-    if (Controller.isTouchingNow) {
+    e.preventDefault();
+    for (let touch of e.changedTouches) {
+      Controller.moveControl(new Vector(touch.offsetX, touch.offsetY));
+    }
+  }
+
+  static startControl(controlVector) {
+    Controller.isControllingNow = true;
+    Controller.controlStartPosition = controlVector;
+    Controller.controllingAmoeba.tryStartControl(
+      Vector.getAddition(controlVector, Renderer.camPosition)
+    );
+  }
+  static endControl() {
+    Controller.isControllingNow = false;
+    Controller.controllingAmoeba.endControl();
+  }
+  static moveControl(controlVector) {
+    if (Controller.isControllingNow) {
       Controller.controllingAmoeba.setControlVector(
-        new Vector(e.offsetX, e.offsetY).minus(Controller.touchStartPosition)
+        controlVector.minus(Controller.controlStartPosition)
       );
     }
   }
