@@ -1,8 +1,10 @@
 import { Vector, interval } from './Helper.js';
 
+const controlRadius = 20;
 const controlPower = 0.03;
 
-const ameobaGravity = 0.002;
+const amoebaBoundary = 1.3;
+const amoebaGravity = 0.005;
 const amoebaMoveFriction = 0.97;
 
 const armExpansion = 1.2;
@@ -25,11 +27,12 @@ export class Amoeba {
       this.arms.push(new Arm(armPosition, armRadius));
       sumArmRadiusSquare += armRadius;
     }
-    this.radius = Math.sqrt(sumArmRadiusSquare);
+    this.radius = Math.sqrt(sumArmRadiusSquare) * amoebaBoundary;
     this.position = new Vector();
     this.velocity = new Vector();
     this.selectedArm = null;
     this.controlVector = new Vector();
+    this.controlStartPosition = new Vector();
 
     setInterval(() => {
       this.tick();
@@ -40,23 +43,22 @@ export class Amoeba {
     this.controlVector = new Vector();
     let localControlPosition = Vector.getMinus(controlPosition, this.position);
 
-    let minDistance = Number.MAX_VALUE;
     for (let arm of this.arms) {
-      let distance = Vector.getDistance(arm.position, localControlPosition);
-      if (distance < minDistance) {
-        minDistance = distance;
-        this.selectedArm = arm;
+      // select boundary only
+      if (arm.position.getLength() > this.radius * amoebaBoundary) {
+        let distance = Vector.getDistance(arm.position, localControlPosition);
+        if (distance < controlRadius) {
+          arm.isSelected = true;
+        }
       }
     }
-    this.selectedArm.isSelected = true;
   }
   endControl() {
-    if (this.selectedArm) {
-      this.selectedArm.velocity.add(
-        Vector.getMultiple(this.controlVector, controlPower)
-      );
-      this.selectedArm.isSelected = false;
-      this.selectedArm = null;
+    for (let arm of this.arms) {
+      if (arm.isSelected) {
+        arm.velocity.add(Vector.getMultiple(this.controlVector, controlPower));
+        arm.isSelected = false;
+      }
     }
   }
 
@@ -94,13 +96,10 @@ export class Amoeba {
       let excess = arm.position.getLength() * armExpansion - this.radius;
       if (excess > 0) {
         arm.velocity.add(
-          Vector.getMultiple(arm.position.getUnit(), -excess * ameobaGravity)
+          Vector.getMultiple(arm.position.getUnit(), -excess * amoebaGravity)
         );
         this.velocity.add(
-          Vector.getMultiple(
-            arm.position.getUnit(),
-            (excess * ameobaGravity * arm.radius) / armRadiusMin
-          )
+          Vector.getMultiple(arm.position.getUnit(), excess * amoebaGravity)
         );
       }
     }
