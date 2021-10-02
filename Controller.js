@@ -23,7 +23,6 @@ export class Controller {
   }
 
   static mouseDownHandler(e) {
-    Renderer.printDebug('test');
     e.preventDefault();
     Controller.startControl(new Vector(e.offsetX, e.offsetY));
   }
@@ -36,22 +35,29 @@ export class Controller {
     Controller.moveControl(new Vector(e.offsetX, e.offsetY));
   }
   static touchStartHandler(e) {
-    Renderer.printDebug('start ' + e);
     e.preventDefault();
-    for (let touch of e.changedTouches) {
-      Controller.startControl(new Vector(touch.offsetX, touch.offsetY));
+    let offsetX = e.target.getBoundingClientRect().left;
+    let offsetY = e.target.getBoundingClientRect().top;
+    for (let touch of e.touches) {
+      Controller.startControl(
+        new Vector(touch.pageX - offsetX, touch.pageY - offsetY)
+      );
+      break;
     }
   }
   static touchEndHandler(e) {
-    Renderer.printDebug('end ' + e);
     e.preventDefault();
     Controller.endControl();
   }
   static touchMoveHandler(e) {
-    Renderer.printDebug('move ' + e);
     e.preventDefault();
-    for (let touch of e.changedTouches) {
-      Controller.moveControl(new Vector(touch.offsetX, touch.offsetY));
+    let offsetX = e.target.getBoundingClientRect().left;
+    let offsetY = e.target.getBoundingClientRect().top;
+    for (let touch of e.touches) {
+      Controller.moveControl(
+        new Vector(touch.pageX - offsetX, touch.pageY - offsetY)
+      );
+      break;
     }
   }
 
