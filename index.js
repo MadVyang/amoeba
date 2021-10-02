@@ -9,17 +9,17 @@ let amoeba;
 
 let frameHandler = () => {
   Renderer.clear();
-  Renderer.smoothlyFocusTo(amoeba.head.position);
+  Renderer.smoothlyFocusTo(amoeba.position);
   Renderer.renderMap(map);
 };
 
 let init = () => {
-  amoeba = new Amoeba(10, 15);
+  amoeba = new Amoeba();
   map = new Map(amoeba);
 
   setInterval(frameHandler, interval);
   window.addEventListener('click', Controller.clickHandler);
-  Controller.setAmoeba(amoeba);
+  Controller.setControllingAmoeba(amoeba);
 };
 
 init();

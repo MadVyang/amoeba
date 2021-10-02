@@ -3,14 +3,15 @@ import { Vector } from './Helper.js';
 
 export class Controller {
   static amoeba;
-  static setAmoeba(amoeba) {
-    Controller.amoeba = amoeba;
+  static setControllingAmoeba(amoeba) {
+    Controller.controllingAmoeba = amoeba;
   }
   static clickHandler(e) {
-    Controller.amoeba.setTarget(
+    console.log(e.pageX, e.pageY);
+    Controller.controllingAmoeba.setTargetPosition(
       new Vector(
-        e.pageX + Renderer.camPosition.x,
-        e.pageY + Renderer.camPosition.y
+        e.offsetX + Renderer.camPosition.x,
+        e.offsetY + Renderer.camPosition.y
       )
     );
   }
