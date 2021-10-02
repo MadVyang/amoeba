@@ -1,6 +1,6 @@
 import { Vector } from './Helper.js';
 
-let _canvas = document.querySelector('canvas');
+let _canvas = document.querySelector('#canvas');
 let _context = canvas.getContext('2d');
 
 export class Renderer {
@@ -16,6 +16,10 @@ export class Renderer {
       Renderer.canvas.width,
       Renderer.canvas.height
     );
+  }
+  static setStyle(color, lineWidth) {
+    Renderer.context.strokeStyle = color;
+    Renderer.context.lineWidth = lineWidth;
   }
   static moveTo(point) {
     let projectedPoint = Renderer.projectToScreen(point);
@@ -46,7 +50,20 @@ export class Renderer {
   }
   static renderAmoeba(amoeba) {
     for (let arm of amoeba.arms) {
-      Renderer.context.strokeStyle = '#CCC';
+      if (arm.isSelected) {
+        Renderer.setStyle('#00A', 2);
+        Renderer.context.beginPath();
+        let armWorldPosition = Vector.getAddition(
+          amoeba.position,
+          arm.position
+        );
+        Renderer.moveTo(armWorldPosition);
+        Renderer.lineTo(
+          Vector.getAddition(armWorldPosition, amoeba.controlVector)
+        );
+        Renderer.context.stroke();
+      } else Renderer.setStyle('#AAA', 1);
+      Renderer.context.beginPath();
       Renderer.moveTo(amoeba.position);
       Renderer.lineTo(Vector.getAddition(amoeba.position, arm.position));
       Renderer.context.stroke();
@@ -57,7 +74,8 @@ export class Renderer {
     let projectedPoint = Renderer.projectToScreen(
       Vector.getAddition(amoebaPosition, arm.position)
     );
-    Renderer.context.strokeStyle = '#CCC';
+    if (arm.isSelected) Renderer.setStyle('#00A', 2);
+    else Renderer.setStyle('#AAA', 1);
     Renderer.context.beginPath();
     Renderer.context.arc(
       projectedPoint.x,
@@ -71,7 +89,7 @@ export class Renderer {
   }
   static renderFood(food) {
     let projectedPoint = Renderer.projectToScreen(food.position);
-    Renderer.context.strokeStyle = '#C00';
+    Renderer.setStyle('#A00', 1);
     Renderer.context.strokeRect(
       projectedPoint.x,
       projectedPoint.y,
@@ -101,5 +119,16 @@ export class Renderer {
       vector.x - Renderer.camPosition.x,
       vector.y - Renderer.camPosition.y
     );
+  }
+
+  static printDebug(debugString) {
+    let debugContext = document.querySelector('#debugPanel').getContext('2d');
+    debugContext.clearRect(
+      0,
+      0,
+      document.querySelector('#debugPanel').width,
+      document.querySelector('#debugPanel').height
+    );
+    debugContext.fillText(debugString, 0, 12);
   }
 }

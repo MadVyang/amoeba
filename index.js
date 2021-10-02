@@ -10,7 +10,7 @@ let amoeba;
 let frameHandler = () => {
   Renderer.clear();
   Renderer.smoothlyFocusTo(amoeba.position);
-  // Renderer.renderMap(map);
+  Renderer.renderMap(map);
 };
 
 let init = () => {
