@@ -75,16 +75,19 @@ export class Amoeba {
   collideArms() {
     for (let i in this.arms) {
       for (let j in this.arms) {
-        if (i >= j) continue;
-        let prevArm = this.arms[i];
-        let arm = this.arms[j];
+        if (i == j) continue;
+        let armA = this.arms[i];
+        let armB = this.arms[j];
         if (
-          Vector.getDistance(prevArm.position, arm.position) <
-          prevArm.radius + arm.radius
+          Vector.getDistance(armA.position, armB.position) <
+          armA.radius + armB.radius
         ) {
-          let delta = Vector.getMinus(prevArm.position, arm.position);
-          let direction = Vector.getLookAt(prevArm.position, arm.position);
-          arm.velocity.add(
+          let delta = Vector.getMinus(armA.position, armB.position);
+          let direction = Vector.getLookAt(armA.position, armB.position);
+          armA.velocity.add(
+            Vector.getMultiple(direction, 1 / delta.getLength())
+          );
+          armB.velocity.add(
             Vector.getMultiple(direction, -1 / delta.getLength())
           );
         }
@@ -108,7 +111,7 @@ export class Amoeba {
     this.velocity.multiply(amoebaMoveFriction);
     this.position.add(this.velocity);
     for (let arm of this.arms) {
-      arm.position.minus(this.velocity);
+      arm.position.minus(Vector.getMultiple(this.velocity, 0.9));
     }
   }
 }
