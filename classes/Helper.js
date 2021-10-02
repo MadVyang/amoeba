@@ -19,11 +19,11 @@ export class Vector {
     this.y *= scalar;
     return this;
   }
-  getSize() {
+  getLength() {
     return Math.sqrt(this.x * this.x + this.y * this.y);
   }
   getUnit() {
-    return Vector.getMultiple(this, 1 / this.getSize());
+    return Vector.getMultiple(this, 1 / this.getLength());
   }
   getDirection() {
     return Math.atan2(this.y, this.x);

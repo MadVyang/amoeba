@@ -3,12 +3,12 @@ import { Vector, interval } from './Helper.js';
 const controlPower = 0.03;
 
 const ameobaGravity = 0.002;
-const amoebaMoveFraction = 0.97;
+const amoebaMoveFriction = 0.97;
 
 const armExpansion = 1.2;
-const armMoveFraction = 0.95;
+const armFriction = 0.1;
 const armRadiusMin = 2;
-const armVelocityMax = 2.5;
+const armVelocityMax = 3;
 
 export class Amoeba {
   constructor(numArms = 100, armDefaultRadius = 5) {
@@ -82,14 +82,16 @@ export class Amoeba {
         ) {
           let delta = Vector.getMinus(prevArm.position, arm.position);
           let direction = Vector.getLookAt(prevArm.position, arm.position);
-          arm.velocity.add(Vector.getMultiple(direction, -1 / delta.getSize()));
+          arm.velocity.add(
+            Vector.getMultiple(direction, -1 / delta.getLength())
+          );
         }
       }
     }
   }
   attachArmToNucleus() {
     for (let arm of this.arms) {
-      let excess = arm.position.getSize() * armExpansion - this.radius;
+      let excess = arm.position.getLength() * armExpansion - this.radius;
       if (excess > 0) {
         arm.velocity.add(
           Vector.getMultiple(arm.position.getUnit(), -excess * ameobaGravity)
@@ -104,7 +106,7 @@ export class Amoeba {
     }
   }
   move() {
-    this.velocity.multiply(amoebaMoveFraction);
+    this.velocity.multiply(amoebaMoveFriction);
     this.position.add(this.velocity);
     for (let arm of this.arms) {
       arm.position.minus(this.velocity);
@@ -133,13 +135,22 @@ export class Arm {
     // this.loss();
   }
   move() {
-    this.velocity.multiply(armMoveFraction);
+    if (this.velocity.getLength() > armVelocityMax) {
+      this.velocity = Vector.getMultiple(
+        this.velocity.getUnit(),
+        armVelocityMax
+      );
+    } else if (this.velocity.getLength() > armFriction) {
+      this.velocity.minus(
+        Vector.getMultiple(this.velocity.getUnit(), armFriction)
+      );
+    } else this.velocity.multiply(0.98);
     this.position.add(this.velocity);
   }
   loss() {
     if (this.radius > armRadiusMin) {
       let radiusLoss =
-        Math.pow(this.velocity.getSize() / armVelocityMax, 2) * 0.1;
+        Math.pow(this.velocity.getLength() / armVelocityMax, 2) * 0.1;
       this.radius -= radiusLoss;
     }
   }
