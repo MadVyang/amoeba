@@ -7,7 +7,7 @@ const amoebaMoveFraction = 0.97;
 
 const armMoveFraction = 0.95;
 const armRadiusMin = 2;
-const armVelocityMax = 2.1;
+const armVelocityMax = 2.5;
 
 export class Amoeba {
   constructor(numArms = 10, armRadius = 20) {
@@ -35,17 +35,16 @@ export class Amoeba {
   tryStartControl(controlPosition) {
     this.controlVector = new Vector();
     let localControlPosition = Vector.getMinus(controlPosition, this.position);
+
+    let minDistance = Number.MAX_VALUE;
     for (let arm of this.arms) {
-      if (
-        Vector.getDistance(arm.position, localControlPosition) <
-        arm.radius * 2
-      ) {
-        arm.isSelected = true;
+      let distance = Vector.getDistance(arm.position, localControlPosition);
+      if (distance < minDistance) {
+        minDistance = distance;
         this.selectedArm = arm;
-        // TODO: select nearest
-        break;
       }
     }
+    this.selectedArm.isSelected = true;
   }
   endControl() {
     if (this.selectedArm) {
@@ -134,11 +133,10 @@ export class Arm {
     this.position.add(this.velocity);
   }
   loss() {
-    if (
-      this.radius > armRadiusMin &&
-      this.velocity.getSize() > armVelocityMax
-    ) {
-      this.radius -= (this.velocity.getSize() / armVelocityMax) * 0.3;
+    if (this.radius > armRadiusMin) {
+      let radiusLoss =
+        Math.pow(this.velocity.getSize() / armVelocityMax, 2) * 0.1;
+      this.radius -= radiusLoss;
     }
   }
 }
