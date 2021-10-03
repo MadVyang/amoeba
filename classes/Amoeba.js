@@ -1,3 +1,4 @@
+import { Map } from './Map.js';
 import { Vector, interval } from './Helper.js';
 
 const controlRadius = 50;
@@ -40,6 +41,7 @@ export class Amoeba {
     }, interval);
   }
 
+  // public
   tryStartControl(controlPosition) {
     this.controlVector = new Vector();
     let localControlPosition = Vector.getMinus(controlPosition, this.position);
@@ -65,9 +67,12 @@ export class Amoeba {
       }
     }
   }
-
   setControlVector(controlVector) {
     this.controlVector = controlVector;
+  }
+
+  addArm(localPosition, radius) {
+    this.arms.push(new Arm(localPosition, radius));
   }
 
   // private
@@ -76,6 +81,7 @@ export class Amoeba {
     this.pullArms();
     this.detachArms();
     this.move();
+    this.tryEat();
   }
   collideArms() {
     for (let i in this.arms) {
@@ -118,6 +124,7 @@ export class Amoeba {
       }
     }
   }
+
   move() {
     if (this.velocity.getLength() > amoebaVelocityMax) {
       this.velocity = Vector.getMultiple(
@@ -133,6 +140,16 @@ export class Amoeba {
 
     for (let arm of this.arms) {
       arm.position.minus(Vector.getMultiple(this.velocity, 0.8));
+    }
+  }
+
+  tryEat() {
+    for (let arm of this.arms) {
+      let food = Map.tryGetFood(arm.position);
+      if (food && !food.isGone) {
+        food.isGone = true;
+        this.addArm(food.getAmoebaLocalPosition(), food.radius);
+      }
     }
   }
 }
@@ -158,6 +175,7 @@ export class Arm {
     this.move();
     // this.loss();
   }
+
   move() {
     if (this.velocity.getLength() > armVelocityMax) {
       this.velocity = Vector.getMultiple(
@@ -171,6 +189,7 @@ export class Arm {
     } else this.velocity.multiply(0.98);
     this.position.add(this.velocity);
   }
+
   loss() {
     if (this.radius > armRadiusMin) {
       let radiusLoss =
