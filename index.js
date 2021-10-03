@@ -1,26 +1,3 @@
-import { Renderer } from './classes/Renderer.js';
-import { Map } from './classes/Map.js';
-import { Amoeba } from './classes/Amoeba.js';
-import { Controller } from './classes/Controller.js';
-import { Vector, interval } from './classes/Helper.js';
+import { Game } from './classes/Game.js';
 
-let map;
-let amoeba;
-
-let frameHandler = () => {
-  Renderer.clear();
-  Renderer.smoothlyFocusTo(amoeba.position);
-  Renderer.renderMap();
-  Renderer.renderScore(amoeba.weight);
-};
-
-let init = () => {
-  amoeba = new Amoeba();
-
-  Map.initialize(amoeba);
-  Controller.initialize(amoeba);
-
-  setInterval(frameHandler, interval);
-};
-
-init();
+Game.initialize();
