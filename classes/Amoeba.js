@@ -94,11 +94,19 @@ export class Amoeba {
         let distance = delta.getLength();
         let direction = Vector.getLookAt(armA.position, armB.position);
         if (distance < armA.radius + armB.radius) {
+          let weightA = armA.radius;
+          let weightB = armB.radius;
           armA.velocity.add(
-            Vector.getMultiple(direction, armRepulsion * distance)
+            Vector.getMultiple(
+              direction,
+              armRepulsion * distance * (weightB / (weightA + weightB))
+            )
           );
           armB.velocity.add(
-            Vector.getMultiple(direction, -armRepulsion * distance)
+            Vector.getMultiple(
+              direction,
+              -armRepulsion * distance * (weightA / (weightA + weightB))
+            )
           );
         }
       }
