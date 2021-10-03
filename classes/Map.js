@@ -99,7 +99,7 @@ export class Food {
     this.radius = radius;
     this.isGone = false;
 
-    setInterval(() => {
+    this.tickPointer = setInterval(() => {
       this.tick();
     }, interval);
   }
@@ -109,6 +109,7 @@ export class Food {
     if (this.radius <= 0) {
       this.radius = 0;
       this.isGone = true;
+      clearInterval(this.tickPointer);
     }
   }
 

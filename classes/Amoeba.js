@@ -11,7 +11,6 @@ const amoebaGravity = 0.0015;
 const armDefaultRadius = 5;
 const armVelocityMax = 5;
 const armFriction = 0.1;
-const armExpansionMax = 1;
 const armRepulsion = 0.01;
 const armLossRatio = 0.001;
 
@@ -80,7 +79,7 @@ export class Amoeba {
   tick() {
     this.collideArms();
     this.pullArms();
-    this.detachArms();
+    this.deleteGoneArms();
     this.move();
     this.tryEat();
     this.setWeight();
@@ -118,11 +117,10 @@ export class Amoeba {
       }
     }
   }
-  detachArms() {
-    for (let arm of this.arms) {
-      let excess = arm.position.getLength() * armExpansionMax - this.radius;
-      if (excess > 0) {
-        //
+  deleteGoneArms() {
+    for (let i in this.arms) {
+      if (this.arms[i].isGone) {
+        this.arms.splice(i, 1);
       }
     }
   }
@@ -177,7 +175,7 @@ export class Arm {
 
     this.isGone = false;
 
-    setInterval(() => {
+    this.tickPointer = setInterval(() => {
       this.tick();
     }, interval);
   }
@@ -206,7 +204,8 @@ export class Arm {
     this.radius -= armLossRatio;
     if (this.radius <= 0) {
       this.isGone = true;
-      this.radius = 0.1;
+      this.radius = 0;
+      clearInterval(this.tickPointer);
     }
   }
 }
