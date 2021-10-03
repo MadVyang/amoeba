@@ -52,7 +52,7 @@ export class Renderer {
 
   static renderScore(score) {
     Renderer.context.font = '12px Arial';
-    Renderer.context.fillText('Weight: ' + score, 8, 20);
+    Renderer.context.fillText('Weight: ' + score.toFixed(2), 8, 20);
   }
 
   static renderMap() {
