@@ -7,12 +7,16 @@ const controlPower = 0.04;
 const amoebaVelocityMax = 10;
 const amoebaFriction = 0.05;
 const amoebaGravity = 0.0015;
+const amoebaWeightMax = 130;
 
 const armDefaultRadius = 5;
 const armVelocityMax = 5;
 const armFriction = 0.1;
 const armRepulsion = 0.01;
 const armLossRatio = 0.001;
+
+const ALIVE = 'ALIVE',
+  EXPLODED = 'EXPLODED';
 
 export class Amoeba {
   constructor(numArms = 100) {
@@ -36,6 +40,8 @@ export class Amoeba {
     this.controlVector = new Vector();
     this.controlStartPosition = new Vector();
 
+    this.state = ALIVE;
+
     setInterval(() => {
       this.tick();
     }, interval);
@@ -43,6 +49,8 @@ export class Amoeba {
 
   // public
   tryStartControl(controlPosition) {
+    if (!this.isAlive()) return;
+
     this.controlVector = new Vector();
     let localControlPosition = Vector.getMinus(controlPosition, this.position);
 
@@ -75,14 +83,20 @@ export class Amoeba {
     this.arms.push(new Arm(localPosition, radius));
   }
 
+  isAlive() {
+    return this.state == ALIVE;
+  }
+
   // private
   tick() {
-    this.collideArms();
-    this.pullArms();
-    this.deleteGoneArms();
-    this.move();
-    this.tryEat();
-    this.setWeight();
+    if (this.isAlive()) {
+      this.collideArms();
+      this.pullArms();
+      this.deleteGoneArms();
+      this.move();
+      this.tryEat();
+      this.setWeight();
+    }
   }
   collideArms() {
     for (let i in this.arms) {
@@ -167,6 +181,17 @@ export class Amoeba {
       this.weight += arm.radius * arm.radius;
     }
     this.weight /= armDefaultRadius * armDefaultRadius;
+
+    if (this.weight > amoebaWeightMax) {
+      this.explode();
+    }
+  }
+
+  explode() {
+    this.state = EXPLODED;
+    for (let arm of this.arms) {
+      arm.velocity.add(Vector.getMultiple(arm.position, armVelocityMax));
+    }
   }
 }
 

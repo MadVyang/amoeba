@@ -62,12 +62,13 @@ export class Renderer {
     }
   }
   static renderAmoeba(amoeba) {
-    Renderer.renderAmoebaBorder(amoeba);
+    if (amoeba.isAlive()) Renderer.renderAmoebaBorder(amoeba);
     for (let arm of amoeba.arms) {
       if (arm.isSelected) {
         Renderer.setStyle(BLUE, 1);
         Renderer.renderArmControl(amoeba, arm);
       } else Renderer.setStyle(BLACK, 1);
+      if (!amoeba.isAlive()) Renderer.setStyle(GREEN, 1);
       Renderer.renderArm(amoeba.position, arm);
     }
   }
