@@ -1,17 +1,17 @@
 import { Vector, interval } from './Helper.js';
 
 const controlRadius = 50;
-const controlPower = 0.1;
+const controlPower = 0.04;
 
 const amoebaVelocityMax = 10;
 const amoebaFriction = 0.05;
 const amoebaBoundary = 1.3;
-const amoebaGravity = 0.003;
+const amoebaGravity = 0.001;
 
-const armVelocityMax = 3;
+const armVelocityMax = 5;
 const armFriction = 0.1;
 const armExpansionMax = 1.2;
-const armRepulsion = 0.03;
+const armRepulsion = 0.01;
 const armGravity = 0.2;
 const armRadiusMin = 2;
 
@@ -48,11 +48,11 @@ export class Amoeba {
 
     for (let arm of this.arms) {
       // select boundary only
-      if (arm.position.getLength() > this.radius * amoebaBoundary) {
+      if (arm.position.getLength() > this.radius * amoebaBoundary || true) {
         let distance = Vector.getDistance(arm.position, localControlPosition);
         if (distance < controlRadius) {
           arm.isSelected = true;
-          arm.selectRatio = 1 - distance / controlRadius;
+          arm.selectRatio = Math.pow(1 - distance / controlRadius, 1.5);
         }
       }
     }
@@ -85,21 +85,15 @@ export class Amoeba {
         let armA = this.arms[i];
         let armB = this.arms[j];
         let delta = Vector.getMinus(armA.position, armB.position);
+        let distance = delta.getLength();
         let direction = Vector.getLookAt(armA.position, armB.position);
-        if (delta.getLength() < armA.radius + armB.radius) {
+        if (distance < armA.radius + armB.radius) {
           armA.velocity.add(
-            Vector.getMultiple(direction, delta.getLength() * armRepulsion)
+            Vector.getMultiple(direction, armRepulsion * distance)
           );
           armB.velocity.add(
-            Vector.getMultiple(direction, -delta.getLength() * armRepulsion)
+            Vector.getMultiple(direction, -armRepulsion * distance)
           );
-        } else if (delta.getLength() < this.radius) {
-          // armA.velocity.add(
-          //   Vector.getMultiple(direction, -armGravity / delta.getLength())
-          // );
-          // armB.velocity.add(
-          //   Vector.getMultiple(direction, armGravity / delta.getLength())
-          // );
         }
       }
     }
@@ -112,7 +106,7 @@ export class Amoeba {
           Vector.getMultiple(arm.position.getUnit(), -excess * amoebaGravity)
         );
         this.velocity.add(
-          Vector.getMultiple(arm.position.getUnit(), excess * amoebaGravity)
+          Vector.getMultiple(arm.position.getUnit(), excess * amoebaGravity * 3)
         );
       }
     }
