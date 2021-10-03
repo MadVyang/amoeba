@@ -33,7 +33,7 @@ export class Game {
     Renderer.clear();
     Renderer.smoothlyFocusTo(Game.amoeba.position);
     Renderer.renderMap();
-    Renderer.renderScore(Game.amoeba.weight);
+    Renderer.renderScore(Game.amoeba);
   }
 
   static action() {

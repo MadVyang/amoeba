@@ -8,6 +8,7 @@ const amoebaVelocityMax = 10;
 const amoebaFriction = 0.05;
 const amoebaGravity = 0.0015;
 const amoebaWeightMax = 130;
+const amoebaWeightMin = 70;
 
 const armDefaultRadius = 5;
 const armVelocityMax = 5;
@@ -15,10 +16,11 @@ const armFriction = 0.1;
 const armRepulsion = 0.01;
 const armLossRatio = 0.001;
 
-const ALIVE = 'ALIVE',
-  EXPLODED = 'EXPLODED';
-
 export class Amoeba {
+  static ALIVE = 'ALIVE';
+  static EXPLODED = 'EXPLODED';
+  static STARVED = 'STARVED';
+
   constructor(numArms = 100) {
     this.arms = [];
     this.weight = 0;
@@ -40,7 +42,7 @@ export class Amoeba {
     this.controlVector = new Vector();
     this.controlStartPosition = new Vector();
 
-    this.state = ALIVE;
+    this.state = Amoeba.ALIVE;
 
     setInterval(() => {
       this.tick();
@@ -84,7 +86,7 @@ export class Amoeba {
   }
 
   isAlive() {
-    return this.state == ALIVE;
+    return this.state == Amoeba.ALIVE;
   }
 
   // private
@@ -96,6 +98,8 @@ export class Amoeba {
       this.move();
       this.tryEat();
       this.setWeight();
+    } else {
+      this.collideArms();
     }
   }
   collideArms() {
@@ -185,12 +189,24 @@ export class Amoeba {
     if (this.weight > amoebaWeightMax) {
       this.explode();
     }
+    if (this.weight < amoebaWeightMin) {
+      this.starve();
+    }
   }
 
   explode() {
-    this.state = EXPLODED;
+    this.state = Amoeba.EXPLODED;
     for (let arm of this.arms) {
-      arm.velocity.add(Vector.getMultiple(arm.position, armVelocityMax));
+      arm.velocity.add(Vector.getMultiple(arm.position, armVelocityMax * 0.5));
+    }
+  }
+
+  starve() {
+    this.state = Amoeba.STARVED;
+    for (let arm of this.arms) {
+      arm.velocity.add(
+        Vector.getMultiple(arm.position, -armVelocityMax * 0.02)
+      );
     }
   }
 }

@@ -1,4 +1,5 @@
 import { Map } from './Map.js';
+import { Amoeba } from './Amoeba.js';
 import { Vector } from './Helper.js';
 
 const RED = '#A00',
@@ -50,9 +51,14 @@ export class Renderer {
     Renderer.context.closePath();
   }
 
-  static renderScore(score) {
+  static renderScore(amoeba) {
     Renderer.context.font = '12px Arial';
-    Renderer.context.fillText('Weight: ' + score.toFixed(2), 8, 20);
+    if (amoeba.isAlive())
+      Renderer.context.fillText('Weight: ' + amoeba.weight.toFixed(2), 8, 20);
+    else if (amoeba.state == Amoeba.EXPLODED)
+      Renderer.context.fillText('Amoeba is exploded.', 8, 20);
+    else if (amoeba.state == Amoeba.STARVED)
+      Renderer.context.fillText('Amoeba starved to death.', 8, 20);
   }
 
   static renderMap() {
