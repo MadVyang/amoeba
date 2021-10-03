@@ -10,15 +10,16 @@ let amoeba;
 let frameHandler = () => {
   Renderer.clear();
   Renderer.smoothlyFocusTo(amoeba.position);
-  Renderer.renderMap(map);
+  Renderer.renderMap();
 };
 
 let init = () => {
   amoeba = new Amoeba();
-  map = new Map(amoeba);
+
+  Map.initialize(amoeba);
+  Controller.initialize(amoeba);
 
   setInterval(frameHandler, interval);
-  Controller.initialize(amoeba);
 };
 
 init();

@@ -1,17 +1,15 @@
-import { Vector } from './Helper.js';
+import { Vector, interval } from './Helper.js';
 
 export class Map {
-  constructor(amoeba, numFoods = 100) {
-    this.amoeba = amoeba;
+  static amoeba = null;
+  static foods = [];
 
-    this.foods = [];
-    for (let i = 0; i < numFoods; i++) {
-      this.foods[i] = new Food(
-        new Vector((Math.random() - 0.5) * 1000, (Math.random() - 0.5) * 1000),
-        Math.random() * 10
-      );
-    }
+  static initialize(amoeba) {
+    Map.amoeba = amoeba;
+    setInterval(Map.tick, interval);
   }
+
+  static tick() {}
 }
 
 export class Food {

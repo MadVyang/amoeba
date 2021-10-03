@@ -1,3 +1,4 @@
+import { Map } from './Map.js';
 import { Vector } from './Helper.js';
 
 const RED = '#A00',
@@ -61,9 +62,9 @@ export class Renderer {
     Renderer.context.closePath();
   }
 
-  static renderMap(map) {
-    Renderer.renderAmoeba(map.amoeba);
-    for (let food of map.foods) {
+  static renderMap() {
+    Renderer.renderAmoeba(Map.amoeba);
+    for (let food of Map.foods) {
       Renderer.renderFood(food);
     }
   }
