@@ -13,8 +13,7 @@ const armVelocityMax = 5;
 const armFriction = 0.1;
 const armExpansionMax = 1;
 const armRepulsion = 0.01;
-const armLossBeginVelocity = 4;
-const armLossRatio = 0.15;
+const armLossRatio = 0.001;
 
 export class Amoeba {
   constructor(numArms = 100) {
@@ -204,13 +203,10 @@ export class Arm {
   }
 
   loss() {
-    if (this.velocity.getLength() > armLossBeginVelocity) {
-      this.radius -=
-        (this.velocity.getLength() / armVelocityMax) * armLossRatio;
-      if (this.radius <= 0) {
-        this.isGone = true;
-        this.radius = 0.1;
-      }
+    this.radius -= armLossRatio;
+    if (this.radius <= 0) {
+      this.isGone = true;
+      this.radius = 0.1;
     }
   }
 }
