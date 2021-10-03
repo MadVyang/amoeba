@@ -62,6 +62,11 @@ export class Renderer {
     Renderer.context.closePath();
   }
 
+  static renderScore(score) {
+    Renderer.context.font = '12px Arial';
+    Renderer.context.fillText('Weight: ' + score, 8, 20);
+  }
+
   static renderMap() {
     Renderer.renderAmoeba(Map.amoeba);
     for (let food of Map.foods) {

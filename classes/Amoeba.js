@@ -8,28 +8,30 @@ const amoebaVelocityMax = 10;
 const amoebaFriction = 0.05;
 const amoebaGravity = 0.0015;
 
+const armDefaultRadius = 5;
 const armVelocityMax = 5;
 const armFriction = 0.1;
 const armExpansionMax = 1;
 const armRepulsion = 0.01;
-const armRadiusMin = 2;
+const armLossBeginVelocity = 4;
+const armLossRatio = 0.15;
 
 export class Amoeba {
-  constructor(numArms = 100, armDefaultRadius = 5) {
+  constructor(numArms = 100) {
     this.arms = [];
-    let tempSpawnRadius = armDefaultRadius / Math.sin(Math.PI / numArms);
-    let armWeight = 0;
+    this.weight = 0;
     for (let i = 0; i < numArms; i++) {
+      let spawnRadius = Math.sqrt(numArms) * armDefaultRadius * Math.random();
       let armPosition = new Vector(
-        Math.cos(i * ((Math.PI * 2) / numArms)) * tempSpawnRadius,
-        Math.sin(i * ((Math.PI * 2) / numArms)) * tempSpawnRadius
+        Math.cos(i * ((Math.PI * 2) / numArms)) * spawnRadius,
+        Math.sin(i * ((Math.PI * 2) / numArms)) * spawnRadius
       );
       let armRadius =
         armDefaultRadius + armDefaultRadius * (Math.random() - 0.5);
       this.arms.push(new Arm(armPosition, armRadius));
-      armWeight += Math.PI * armRadius * armRadius;
+      this.weight += Math.PI * armRadius * armRadius;
     }
-    this.radius = Math.sqrt(armWeight) / Math.PI;
+    this.radius = Math.sqrt(this.weight) / Math.PI;
     this.position = new Vector();
     this.velocity = new Vector();
     this.selectedArm = null;
@@ -82,6 +84,7 @@ export class Amoeba {
     this.detachArms();
     this.move();
     this.tryEat();
+    this.setWeight();
   }
   collideArms() {
     for (let i in this.arms) {
@@ -152,6 +155,14 @@ export class Amoeba {
       }
     }
   }
+
+  setWeight() {
+    this.weight = 0;
+    for (let arm of this.arms) {
+      this.weight += arm.radius * arm.radius;
+    }
+    this.weight /= armDefaultRadius * armDefaultRadius;
+  }
 }
 
 export class Arm {
@@ -165,6 +176,8 @@ export class Arm {
     this.selectRatio = 0;
     this.controlVector = new Vector();
 
+    this.isGone = false;
+
     setInterval(() => {
       this.tick();
     }, interval);
@@ -173,7 +186,7 @@ export class Arm {
   // private
   tick() {
     this.move();
-    // this.loss();
+    this.loss();
   }
 
   move() {
@@ -191,10 +204,13 @@ export class Arm {
   }
 
   loss() {
-    if (this.radius > armRadiusMin) {
-      let radiusLoss =
-        Math.pow(this.velocity.getLength() / armVelocityMax, 2) * 0.1;
-      this.radius -= radiusLoss;
+    if (this.velocity.getLength() > armLossBeginVelocity) {
+      this.radius -=
+        (this.velocity.getLength() / armVelocityMax) * armLossRatio;
+      if (this.radius <= 0) {
+        this.isGone = true;
+        this.radius = 0.1;
+      }
     }
   }
 }

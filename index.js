@@ -11,6 +11,7 @@ let frameHandler = () => {
   Renderer.clear();
   Renderer.smoothlyFocusTo(amoeba.position);
   Renderer.renderMap();
+  Renderer.renderScore(amoeba.weight);
 };
 
 let init = () => {
