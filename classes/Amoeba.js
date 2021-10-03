@@ -52,6 +52,7 @@ export class Amoeba {
         let distance = Vector.getDistance(arm.position, localControlPosition);
         if (distance < controlRadius) {
           arm.isSelected = true;
+          arm.selectRatio = 1 - distance / controlRadius;
         }
       }
     }
@@ -59,7 +60,9 @@ export class Amoeba {
   endControl() {
     for (let arm of this.arms) {
       if (arm.isSelected) {
-        arm.velocity.add(Vector.getMultiple(this.controlVector, controlPower));
+        arm.velocity.add(
+          Vector.getMultiple(this.controlVector, controlPower * arm.selectRatio)
+        );
         arm.isSelected = false;
       }
     }
@@ -141,6 +144,7 @@ export class Arm {
     this.velocity = new Vector();
 
     this.isSelected = false;
+    this.selectRatio = 0;
     this.controlVector = new Vector();
 
     setInterval(() => {

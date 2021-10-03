@@ -70,7 +70,7 @@ export class Renderer {
   static renderAmoeba(amoeba) {
     for (let arm of amoeba.arms) {
       if (arm.isSelected) {
-        Renderer.setStyle(BLUE, 1);
+        Renderer.setStyle(Renderer.blendColor(BLUE, BLACK, arm.selectRatio), 1);
         Renderer.context.beginPath();
         let armWorldPosition = Vector.getAddition(
           amoeba.position,
@@ -78,7 +78,10 @@ export class Renderer {
         );
         Renderer.moveTo(armWorldPosition);
         Renderer.lineTo(
-          Vector.getAddition(armWorldPosition, amoeba.controlVector)
+          Vector.getAddition(
+            armWorldPosition,
+            Vector.getMultiple(amoeba.controlVector, arm.selectRatio)
+          )
         );
         Renderer.context.stroke();
       } else Renderer.setStyle(BLACK, 1);
@@ -90,8 +93,6 @@ export class Renderer {
     }
   }
   static renderArm(amoebaPosition, arm) {
-    if (arm.isSelected) Renderer.setStyle(BLUE, 1);
-    else Renderer.setStyle(BLACK, 1);
     Renderer.circle(
       Vector.getAddition(amoebaPosition, arm.position),
       arm.radius
@@ -134,5 +135,23 @@ export class Renderer {
       document.querySelector('#debugPanel').height
     );
     debugContext.fillText(debugString, 0, 12);
+  }
+
+  static blendColor(color1, color2, ratio) {
+    let R1 = Number('0x' + color1.substr(1, 1));
+    let G1 = Number('0x' + color1.substr(2, 1));
+    let B1 = Number('0x' + color1.substr(3, 1));
+    let R2 = Number('0x' + color2.substr(1, 1));
+    let G2 = Number('0x' + color2.substr(2, 1));
+    let B2 = Number('0x' + color2.substr(3, 1));
+    let R = R1 * ratio + R2 * (1 - ratio);
+    let G = G1 * ratio + G2 * (1 - ratio);
+    let B = B1 * ratio + B2 * (1 - ratio);
+    return (
+      '#' +
+      Math.round(R).toString(16) +
+      Math.round(G).toString(16) +
+      Math.round(B).toString(16)
+    );
   }
 }
