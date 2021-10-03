@@ -3,11 +3,12 @@ import { Vector, interval } from './Helper.js';
 
 const foodShrink = 0.005;
 const foodCellSize = 20;
+const foodSpawnRate = 500;
+const foodMax = 30;
 
 export class Map {
   static amoeba;
   static foods = [];
-  static foodSpawnRate = 500;
   static foodGrid;
   static foodGridW;
   static foodGridH;
@@ -20,7 +21,7 @@ export class Map {
     Map.setFoodGrid();
 
     setInterval(Map.tick, interval);
-    setInterval(Map.autoSpawnFood, Map.foodSpawnRate);
+    setInterval(Map.autoSpawnFood, foodSpawnRate);
   }
 
   static tick() {
@@ -29,6 +30,8 @@ export class Map {
   }
 
   static autoSpawnFood() {
+    if (Map.foods.length > foodMax) return;
+
     let delta = new Vector();
     while (delta.getLength() < Map.amoeba.radius) {
       delta = new Vector(
