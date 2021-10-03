@@ -62,8 +62,7 @@ export class Renderer {
     }
   }
   static renderAmoeba(amoeba) {
-    // Renderer.setStyle(BLACK, 1);
-    // Renderer.circle(amoeba.position, amoeba.radius);
+    Renderer.renderAmoebaBorder(amoeba);
     for (let arm of amoeba.arms) {
       if (arm.isSelected) {
         Renderer.setStyle(BLUE, 1);
@@ -71,6 +70,49 @@ export class Renderer {
       } else Renderer.setStyle(BLACK, 1);
       Renderer.renderArm(amoeba.position, arm);
     }
+  }
+  static renderAmoebaBorder(amoeba) {
+    let accuracy = 360;
+    let distances = new Array(accuracy).fill(0);
+    for (let arm of amoeba.arms) {
+      let direction = arm.position.getDirection() + Math.PI * 2;
+      if (direction > Math.PI * 2) direction -= Math.PI * 2;
+      let index = Math.floor(accuracy * (direction / (Math.PI * 2)));
+      let distance = arm.position.getLength() + arm.radius;
+      if (distances[index] < distance) distances[index] = distance;
+    }
+    let points = [];
+    let prevDistance = amoeba.radius;
+    for (let i = 0; i < accuracy * 2; i++) {
+      let index = i % accuracy;
+      if (distances[index] < prevDistance * 0.98)
+        distances[index] = prevDistance * 0.98;
+      prevDistance = distances[index];
+    }
+    for (let i = accuracy * 2; i >= 0; i--) {
+      let index = i % accuracy;
+      if (distances[index] < prevDistance * 0.98)
+        distances[index] = prevDistance * 0.98;
+      prevDistance = distances[index];
+    }
+    for (let i = 0; i < accuracy; i++) {
+      let direction = (i / accuracy) * (Math.PI * 2);
+      points.push(
+        new Vector(
+          distances[i] * Math.cos(direction),
+          distances[i] * Math.sin(direction)
+        ).add(amoeba.position)
+      );
+    }
+    Renderer.setStyle('#000', 1);
+    Renderer.context.beginPath();
+    Renderer.moveTo(points[0]);
+    for (let i in points) {
+      Renderer.lineTo(points[i]);
+    }
+    Renderer.lineTo(points[0]);
+    Renderer.context.stroke();
+    Renderer.context.closePath();
   }
   static renderArm(amoebaPosition, arm) {
     Renderer.circle(
