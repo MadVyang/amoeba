@@ -3,7 +3,7 @@ import { Vector, interval } from './Helper.js';
 
 const foodShrink = 0.005;
 const foodCellSize = 20;
-const foodSpawnRate = 500;
+const foodSpawnRate = 200;
 const foodMax = 30;
 
 export class Map {
@@ -31,17 +31,16 @@ export class Map {
 
   static autoSpawnFood() {
     if (Map.foods.length > foodMax) return;
-
-    let delta = new Vector();
-    while (delta.getLength() < Map.amoeba.radius) {
-      delta = new Vector(
-        (Math.random() - 0.5) * Renderer.screenSize.x,
-        (Math.random() - 0.5) * Renderer.screenSize.y
-      );
-    }
+    let distance =
+      Math.random() * Map.amoeba.radius * 6 + Map.amoeba.radius * 4;
+    let direction = Math.random() * Math.PI * 2;
+    let delta = new Vector(
+      Math.cos(direction) * distance,
+      Math.sin(direction) * distance
+    );
     Map.spawnFood(
       Vector.getAddition(Map.amoeba.position, delta),
-      Math.random() * 10 + 3
+      Math.random() * 4 + 10
     );
   }
 
