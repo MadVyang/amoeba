@@ -12,7 +12,10 @@ export class Game {
   static state = PLAYING;
   static amoeba;
   static initialize() {
+    Renderer.initialize();
+
     Game.amoeba = new Amoeba();
+
     Map.initialize(Game.amoeba);
     Controller.initialize(Game.amoeba);
 

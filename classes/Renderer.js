@@ -8,14 +8,18 @@ const RED = '#A00',
   BLACK = '#AAA';
 const smoothness = 0.9;
 
-let _canvas = document.querySelector('#canvas');
-let _context = canvas.getContext('2d');
-
 export class Renderer {
-  static canvas = _canvas;
-  static context = _context;
-  static screenSize = new Vector(_canvas.width, _canvas.height);
-  static camPosition = new Vector(-_canvas.width / 2, -_canvas.height / 2);
+  static canvas;
+  static context;
+  static screenSize;
+  static camPosition;
+
+  static initialize() {
+    Renderer.canvas = document.querySelector('#canvas');
+    Renderer.context = canvas.getContext('2d');
+    Renderer.screenSize = new Vector(canvas.width, canvas.height);
+    Renderer.camPosition = new Vector(-canvas.width / 2, -canvas.height / 2);
+  }
 
   static clear() {
     Renderer.context.clearRect(
