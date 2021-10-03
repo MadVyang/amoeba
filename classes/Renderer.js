@@ -36,18 +36,6 @@ export class Renderer {
     let projectedPoint = Renderer.projectToScreen(point);
     Renderer.context.lineTo(projectedPoint.x, projectedPoint.y);
   }
-  static quadraticCurveTo(controlPoint, targetPoint) {
-    // Renderer.lineTo(controlPoint);
-    // Renderer.lineTo(targetPoint);
-    let projectedControlPoint = Renderer.projectToScreen(controlPoint);
-    let projectedTargetPoint = Renderer.projectToScreen(targetPoint);
-    Renderer.context.quadraticCurveTo(
-      projectedControlPoint.x,
-      projectedControlPoint.y,
-      projectedTargetPoint.x,
-      projectedTargetPoint.y
-    );
-  }
   static circle(point, radius) {
     let projectedPoint = Renderer.projectToScreen(point);
     Renderer.context.beginPath();
@@ -74,29 +62,13 @@ export class Renderer {
     }
   }
   static renderAmoeba(amoeba) {
-    Renderer.setStyle(BLACK, 1);
-    Renderer.circle(amoeba.position, amoeba.radius);
+    // Renderer.setStyle(BLACK, 1);
+    // Renderer.circle(amoeba.position, amoeba.radius);
     for (let arm of amoeba.arms) {
       if (arm.isSelected) {
-        Renderer.setStyle(Renderer.blendColor(BLUE, BLACK, arm.selectRatio), 1);
-        Renderer.context.beginPath();
-        let armWorldPosition = Vector.getAddition(
-          amoeba.position,
-          arm.position
-        );
-        Renderer.moveTo(armWorldPosition);
-        Renderer.lineTo(
-          Vector.getAddition(
-            armWorldPosition,
-            Vector.getMultiple(amoeba.controlVector, arm.selectRatio)
-          )
-        );
-        Renderer.context.stroke();
+        Renderer.setStyle(BLUE, 1);
+        Renderer.renderArmControl(amoeba, arm);
       } else Renderer.setStyle(BLACK, 1);
-      // Renderer.context.beginPath();
-      // Renderer.moveTo(amoeba.position);
-      // Renderer.lineTo(Vector.getAddition(amoeba.position, arm.position));
-      // Renderer.context.stroke();
       Renderer.renderArm(amoeba.position, arm);
     }
   }
@@ -105,6 +77,18 @@ export class Renderer {
       Vector.getAddition(amoebaPosition, arm.position),
       arm.radius
     );
+  }
+  static renderArmControl(amoeba, arm) {
+    Renderer.context.beginPath();
+    let armWorldPosition = Vector.getAddition(amoeba.position, arm.position);
+    Renderer.moveTo(armWorldPosition);
+    Renderer.lineTo(
+      Vector.getAddition(
+        armWorldPosition,
+        Vector.getMultiple(amoeba.controlVector, arm.selectRatio)
+      )
+    );
+    Renderer.context.stroke();
   }
   static renderFood(food) {
     Renderer.setStyle(GREEN, 1);
