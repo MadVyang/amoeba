@@ -5,21 +5,19 @@ const controlPower = 0.04;
 
 const amoebaVelocityMax = 10;
 const amoebaFriction = 0.05;
-const amoebaBoundary = 1.3;
-const amoebaGravity = 0.001;
+const amoebaGravity = 0.0015;
 
 const armVelocityMax = 5;
 const armFriction = 0.1;
-const armExpansionMax = 1.2;
+const armExpansionMax = 1;
 const armRepulsion = 0.01;
-const armGravity = 0.2;
 const armRadiusMin = 2;
 
 export class Amoeba {
   constructor(numArms = 100, armDefaultRadius = 5) {
     this.arms = [];
     let tempSpawnRadius = armDefaultRadius / Math.sin(Math.PI / numArms);
-    let sumArmRadiusSquare = 0;
+    let armWeight = 0;
     for (let i = 0; i < numArms; i++) {
       let armPosition = new Vector(
         Math.cos(i * ((Math.PI * 2) / numArms)) * tempSpawnRadius,
@@ -28,9 +26,9 @@ export class Amoeba {
       let armRadius =
         armDefaultRadius + armDefaultRadius * (Math.random() - 0.5);
       this.arms.push(new Arm(armPosition, armRadius));
-      sumArmRadiusSquare += armRadius;
+      armWeight += Math.PI * armRadius * armRadius;
     }
-    this.radius = Math.sqrt(sumArmRadiusSquare) * amoebaBoundary;
+    this.radius = Math.sqrt(armWeight) / Math.PI;
     this.position = new Vector();
     this.velocity = new Vector();
     this.selectedArm = null;
@@ -48,7 +46,7 @@ export class Amoeba {
 
     for (let arm of this.arms) {
       // select boundary only
-      if (arm.position.getLength() > this.radius * amoebaBoundary || true) {
+      if (arm.position.getLength() > this.radius || true) {
         let distance = Vector.getDistance(arm.position, localControlPosition);
         if (distance < controlRadius) {
           arm.isSelected = true;
@@ -75,7 +73,8 @@ export class Amoeba {
   // private
   tick() {
     this.collideArms();
-    this.attachArmToNucleus();
+    this.pullArms();
+    this.detachArms();
     this.move();
   }
   collideArms() {
@@ -98,16 +97,24 @@ export class Amoeba {
       }
     }
   }
-  attachArmToNucleus() {
+  pullArms() {
     for (let arm of this.arms) {
-      let excess = arm.position.getLength() * armExpansionMax - this.radius;
+      let excess = arm.position.getLength() - this.radius;
       if (excess > 0) {
         arm.velocity.add(
           Vector.getMultiple(arm.position.getUnit(), -excess * amoebaGravity)
         );
         this.velocity.add(
-          Vector.getMultiple(arm.position.getUnit(), excess * amoebaGravity * 3)
+          Vector.getMultiple(arm.position.getUnit(), excess * amoebaGravity)
         );
+      }
+    }
+  }
+  detachArms() {
+    for (let arm of this.arms) {
+      let excess = arm.position.getLength() * armExpansionMax - this.radius;
+      if (excess > 0) {
+        //
       }
     }
   }

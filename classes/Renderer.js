@@ -69,6 +69,8 @@ export class Renderer {
     }
   }
   static renderAmoeba(amoeba) {
+    Renderer.setStyle(BLACK, 1);
+    Renderer.circle(amoeba.position, amoeba.radius);
     for (let arm of amoeba.arms) {
       if (arm.isSelected) {
         Renderer.setStyle(Renderer.blendColor(BLUE, BLACK, arm.selectRatio), 1);
