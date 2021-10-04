@@ -60,7 +60,7 @@ export class Renderer {
     if (amoeba.isAlive())
       Renderer.context.fillText('Weight: ' + amoeba.weight.toFixed(2), 8, 20);
     else if (amoeba.state == Amoeba.EXPLODED)
-      Renderer.context.fillText('Amoeba is exploded.', 8, 20);
+      Renderer.context.fillText('Amoeba exploded.', 8, 20);
     else if (amoeba.state == Amoeba.STARVED)
       Renderer.context.fillText('Amoeba starved to death.', 8, 20);
   }
